@@ -1,0 +1,21 @@
+module github.com/kuaa-io/arandu-paddleocr
+
+go 1.26.0
+
+require (
+	github.com/arandu-io/framework v0.50.1
+	github.com/kuaa-io/arandu-onnx v0.0.0-00010101000000-000000000000
+	golang.org/x/image v0.46.0
+)
+
+require (
+	github.com/arandu-io/hesape v0.44.1 // indirect
+	github.com/yalue/onnxruntime_go v1.31.0 // indirect
+	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
+)
+
+// arandu-onnx is not published yet. The replace resolves it from the sibling
+// checkout and is removed once that module is tagged.
+replace github.com/kuaa-io/arandu-onnx => ../arandu-onnx
