@@ -1,0 +1,16 @@
+{
+  "id": "pp-lcnet_x1_0_doc_ori",
+  "version": "7330ab703912",
+  "file": "PP-LCNet_x1_0_doc_ori_onnx/inference.onnx",
+  "sha256": "af9a0a4f317ff0709ce752067807f819cb15d883f8ecad89f28df1c6ee2d9c92",
+  "source_url": "https://huggingface.co/PaddlePaddle/PP-LCNet_x1_0_doc_ori_onnx/resolve/7330ab7039123e46af2dc03154b9969aa412c61d/inference.onnx",
+  "license": "Apache-2.0",
+  "model_license": "Apache-2.0",
+  "commercial_use": "yes",
+  "redistribution": "allowed under Apache-2.0, with its licence and notice",
+  "modification": "allowed under Apache-2.0",
+  "status": "approved",
+  "inputs": [{"name": "x", "element_type": "float32", "shape": [-1, 3, 224, 224]}],
+  "outputs": [{"name": "fetch_name_0", "element_type": "float32", "shape": [-1, 4]}],
+  "precision": "fp32"
+}
