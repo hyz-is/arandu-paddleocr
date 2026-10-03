@@ -15,10 +15,9 @@ names the situation you are in rather than the topic it covers.
 | --- | --- |
 | `paddleocr-module` | changing the pipeline, the post-processing, the decoding, a manifest or the download command |
 | `paddleocr-release` | the gates, the manifest, a dependency, a version, a tag |
-| `paddleocr-vault-notes` | writing the note, the gap or the journal entry, when this checkout sits inside the KUAA vault |
 | `paddleocr-package` | installing and wiring this package **into an application** |
 
-The last one has a different audience from the other three, and that is on
+The last one has a different audience from the other two, and that is on
 purpose: it travels with the package so that an assistant working in somebody
 else's project has the build requirement, the models, the wiring and the result
 shape in front of it instead of guessing.
