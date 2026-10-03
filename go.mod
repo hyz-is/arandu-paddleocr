@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/arandu-io/framework v0.50.1
-	github.com/hyz-is/arandu-onnx v0.0.0-00010101000000-000000000000
+	github.com/hyz-is/arandu-onnx v0.1.0
 	golang.org/x/image v0.46.0
 )
 
@@ -15,7 +15,3 @@ require (
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 )
-
-// arandu-onnx is not published yet. The replace resolves it from the sibling
-// checkout and is removed once that module is tagged.
-replace github.com/hyz-is/arandu-onnx => ../arandu-onnx
