@@ -4,106 +4,45 @@
 
 # Arandu PaddleOCR
 
-An Arandu package that reads the text on an image with the PaddleOCR PP-OCRv5
-models, run through ONNX Runtime by
-[`arandu-onnx`](https://github.com/hyz-is/arandu-onnx). It finds the lines,
-straightens them, reads them, and returns each line with its box, its
-confidence and the models that produced it. It decides nothing: what the text
-means — a name, a CPF, a machine-readable zone — is the application's
-business.
+It reads the text on an image with the PaddleOCR PP-OCRv5 models, and decides
+nothing about what the text means.
 
-The models run in ONNX Runtime. Everything around them is Go:
+The models run in ONNX Runtime through
+[`arandu-onnx`](https://github.com/hyz-is/arandu-onnx). Everything around them —
+resizing, DB post-processing, geometry, perspective crop, CTC decoding — is Go.
+A call returns each line of text with its box, its confidence, the detector's
+score, and the identity of every model that contributed, for the application to
+record as evidence.
 
-1. **Page orientation** (optional): PP-LCNet_x1_0_doc_ori classifies the page
-   as turned by 0, 90, 180 or 270 degrees (short side 256, centre crop 224,
-   ImageNet normalization in RGB order), and the page is turned upright.
-2. **Detection**: the page is scaled so its longer side is at most 960 pixels,
-   in multiples of 32, normalized in BGR order, and PP-OCRv5 det returns a
-   probability map. (The `resize_long: 960` of its `inference.yml` is applied as
-   PaddleX applies it to the PP-OCRv5 detectors: a cap on the longer side,
-   never an enlargement.) DB post-processing follows: binarize at 0.3, 8-connected
-   regions, minimum-area rectangle by rotating calipers over the convex hull,
-   mean probability inside the box (kept from 0.6), unclip by 1.5 × area /
-   perimeter, rectangle again, scale back to the page, clip, and PaddleOCR's
-   reading order with a 10-pixel row tolerance.
-3. **Crop**: each box is straightened with a perspective warp (a homography
-   from its four corners, bilinear sampling, edge repeated). A crop at least
-   1.5 times taller than wide is turned 90 degrees.
-4. **Line orientation** (optional): PP-LCNet_x0_25_textline_ori, on the line
-   resized to 160×80 with ImageNet normalization in RGB order, turns a line
-   whose probability of 180 degrees reaches 0.9.
-5. **Recognition**: each line is resized to height 48, normalized to −1..1 in
-   BGR order, batched with lines of similar aspect ratio and right-padded with
-   zeros, and the recognizer's output is decoded by CTC greedy decoding:
-   argmax per step, repeats collapsed, blank dropped, classes mapped **by
-   index** onto the dictionary (it lists some characters twice). Confidence is
-   the mean probability of the kept steps. An optional charset narrows the
-   classes that compete, for a machine-readable zone say.
+## What it is not
 
-The constants are those of each model's own `inference.yml` and of PaddleOCR's
-DB and CTC post-processing; the unit tests pin them with values worked out by
-hand.
+- **Not a decision.** It never says a document is valid, a field matches or a
+  check passed. It returns text and confidences; thresholds and verdicts belong
+  to the application's decision layer.
+- **Not a document parser.** It does not know what a CPF, a date or a
+  machine-readable zone is. An optional charset is the most it is told.
+- **Not a model distribution.** The model weights are not in this repository.
+  A separate command downloads them from their pinned upstream revisions and
+  verifies their digests; see [THIRD_PARTY_MODELS.md](THIRD_PARTY_MODELS.md).
+- **Not a network client.** The library reads files from the directory it is
+  given and never opens a connection.
 
-## Build requirement
+## Requirements
 
-Those of `arandu-onnx`: `CGO_ENABLED=1`, a C compiler, and the ONNX Runtime
-shared library, 1.26 or later, on the machine that runs the application.
-Development and the tests use 1.30.0.
+| | |
+| --- | --- |
+| Go | 1.26 or later |
+| cgo | `CGO_ENABLED=1` and a C compiler (the ONNX Runtime binding is cgo) |
+| ONNX Runtime | the shared library, **1.26 or later**; development and CI use **1.30.0**. Installation per operating system is in the [`arandu-onnx` README](https://github.com/hyz-is/arandu-onnx#installing-onnx-runtime) (`brew install onnxruntime` on macOS; the release archive on Linux) |
+| Arandu | framework 0.50 or later, and `github.com/hyz-is/arandu-onnx` |
+| Models | about 117 MB for all six files (13 MB for the default mobile detector and Latin recognizer); fetched once with `cmd/paddleocr-models` |
 
 ## Install
 
 ```bash
-go get github.com/hyz-is/arandu-paddleocr
+go get github.com/hyz-is/arandu-paddleocr@v0.1.0
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models@v0.1.0 -dir /srv/models/ocr
 ```
-
-Until `arandu-onnx` is tagged, `go.mod` resolves it from the sibling checkout:
-
-```
-replace github.com/hyz-is/arandu-onnx => ../arandu-onnx
-```
-
-That line is removed, and `arandu-onnx` required at its tag, once that module
-is published. The release workflow refuses to publish this one while it is
-there.
-
-## The models
-
-The model files are not in this repository. Each has a manifest, embedded in
-the package under `manifests/`, recording its source revision, SHA-256,
-licences and contract; `Runtime.Open` verifies every file against it before
-ONNX Runtime reads a byte.
-
-| id | model | revision | sha256 | size |
-| --- | --- | --- | --- | --- |
-| `pp-ocrv5_mobile_det` | PP-OCRv5_mobile_det | `e6f4fa85f00e` | `a431985659dc…` | 4.8 MB |
-| `pp-ocrv5_server_det` | PP-OCRv5_server_det | `dcf248c4dcc0` | `10803475a591…` | 88 MB |
-| `latin_pp-ocrv5_mobile_rec` | latin_PP-OCRv5_mobile_rec, 838 classes | `89d3a50e2c27` | `788811307226…` | 8.0 MB |
-| `en_pp-ocrv5_mobile_rec` | en_PP-OCRv5_mobile_rec, 438 classes | `3fafbc3b5dcf` | `b5f833dfc5d0…` | 7.8 MB |
-| `pp-lcnet_x0_25_textline_ori` | PP-LCNet_x0_25_textline_ori | `aea1f18d9733` | `94a6a0a0425f…` | 1.0 MB |
-| `pp-lcnet_x1_0_doc_ori` | PP-LCNet_x1_0_doc_ori | `7330ab703912` | `af9a0a4f317f…` | 6.8 MB |
-
-All come from the official `PaddlePaddle/<name>_onnx` repositories on Hugging
-Face, under Apache-2.0, `approved`, fp32. The full digests are in the
-manifests. The recognizers' dictionaries — the `character_dict` of each
-model's `inference.yml`, one character per line — are embedded under
-`dictionaries/` and checked against their digest when the module is built.
-
-A models directory holds each file under its repository's name, as the
-manifests' `file` fields say (`PP-OCRv5_mobile_det_onnx/inference.onnx`, …).
-`cmd/paddleocr-models` fills one:
-
-```bash
-go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
-go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr -check
-```
-
-It downloads each file over HTTPS from the revision its manifest pins, follows
-only HTTPS redirects, hashes while it writes, and keeps the file only when the
-digest matches. `-only` takes a comma-separated list of ids; `-check` verifies
-what is there and connects to nothing. **The command is the only code here
-that opens a network connection.** The library an application links reads
-files from the directory it is given, which is why `arandu.mod.toml` declares
-`network = false`.
 
 ## Wire it
 
@@ -150,43 +89,11 @@ naming the model. `Health` reports whether the models are open and the runtime
 under them is usable. `Close` closes the sessions. Registering it adds no
 route, no table and no background loop.
 
-## Read a page
-
-```go
-img, err := onnx.DecodeImage(upload) // JPEG or PNG, turned upright by EXIF
-page, err := ocrModule.Recognize(ctx, img, paddleocr.Options{})
-for _, line := range page.Lines {
-	// line.Text, line.Confidence, line.DetectionScore, line.Box, line.Order
-}
-evidence := page.Models // ID, Version, SHA256, Runtime, Precision, Provider, Status
-```
-
-A machine-readable zone, read through its alphabet:
-
-```go
-page, err := ocrModule.Recognize(ctx, zone, paddleocr.Options{
-	Charset: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<",
-})
-```
-
-`Page` carries the size of the image as given, the `Rotation` applied to stand
-it upright, the `Lines` in reading order, the `Models` that contributed (each
-`onnx.ModelInfo`, with digest and status) and the `Timings` of each stage.
-Every `Line.Box` is in the coordinates of the image as given; its corners are
-the text's top-left, top-right, bottom-right and bottom-left, so on a turned
-page the first corner is not the image's top-left.
-
-The pure-Go stages are exported for reuse and testing: `DBPostProcess`,
-`BoxScore`, `ConvexHull`, `MinAreaRect`, `MiniBox`, `Unclip`,
-`OrderClockwise`, `ReadingOrder`, `PerspectiveTransform`, `WarpQuad`,
-`CropSize`, `Rotate`, `DecodeCTC`, `Vocabulary`, `DetectorInputSize` and
-`RecognizerInputWidth`.
-
 ## Configuration
 
 | Field | Default | What it does |
 | --- | --- | --- |
-| `ModelsDir` | required | The directory the model files are in |
+| `ModelsDir` | required | The directory the model files are in, laid out as `cmd/paddleocr-models` writes it |
 | `Detector` | `mobile` | `mobile` or `server` (larger, about five times slower) |
 | `Recognizer` | `latin` | `latin` (accented Latin, 838 classes) or `en` (438 classes) |
 | `UseDocOrientation` | `false` | Classify and turn the page by 0/90/180/270 before detection |
@@ -200,7 +107,130 @@ The pure-Go stages are exported for reuse and testing: `DBPostProcess`,
 | `RecMaxWidth` | `3200` | Widest line image the recognizer is given, 320 to 8000 |
 | `TextlineThreshold` | `0.9` | Probability of 180 degrees a line needs to be turned |
 
-A numeric field left at zero takes its default.
+A numeric field left at zero takes its default. `New` validates the
+configuration and returns an error rather than starting half-wired.
+
+`Thresh`, `BoxThresh` and `TextlineThreshold` are the models' own
+post-processing constants, not decisions: they choose which pixels and boxes
+are text, and nothing about what the text means.
+
+## Read a page
+
+```go
+img, err := onnx.DecodeImage(upload) // JPEG or PNG, turned upright by EXIF
+page, err := ocrModule.Recognize(ctx, img, paddleocr.Options{})
+for _, line := range page.Lines {
+	// line.Text, line.Confidence, line.DetectionScore, line.Box, line.Order, line.Flipped
+}
+evidence := page.Models // one onnx.ModelInfo per model: ID, Version, SHA256, Runtime, Provider, Status
+```
+
+A machine-readable zone, read through its alphabet:
+
+```go
+page, err := ocrModule.Recognize(ctx, zone, paddleocr.Options{
+	Charset: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<",
+})
+```
+
+`Page` carries the size of the image as given, the `Rotation` applied to stand
+it upright, the `Lines` in reading order, the `Models` that contributed and the
+`Timings` of each stage. Every `Line.Box` is in the coordinates of the image as
+given; its corners are the text's top-left, top-right, bottom-right and
+bottom-left, so on a turned page the first corner is not the image's top-left.
+
+`Recognize` is safe for concurrent use. Calls share the ONNX Runtime sessions,
+whose runs are thread-safe; the module's reader-writer lock lets them proceed
+together and makes `Close` wait for them. Before `Boot` it returns
+`ErrNotBooted`, after `Close` `ErrClosed`.
+
+## The pipeline, stage by stage
+
+1. **Page orientation** (optional): PP-LCNet_x1_0_doc_ori classifies the page
+   as turned by 0, 90, 180 or 270 degrees (short side 256, centre crop 224,
+   ImageNet normalization in RGB order), and the page is turned upright.
+2. **Detection**: the page is scaled so its longer side is at most 960 pixels,
+   in multiples of 32, normalized in BGR order, and PP-OCRv5 det returns a
+   probability map. The `resize_long: 960` of the model's `inference.yml` is a
+   cap on the longer side, never an enlargement. DB post-processing follows:
+   binarize at 0.3, 8-connected regions, minimum-area rectangle by rotating
+   calipers over the convex hull, mean probability inside the box (kept from
+   0.6), unclip by 1.5 × area / perimeter, rectangle again, scale back to the
+   page, clip, and reading order with a 10-pixel row tolerance.
+3. **Crop**: each box is straightened with a perspective warp (a homography
+   from its four corners, bilinear sampling, edge repeated). A crop at least
+   1.5 times taller than wide is turned 90 degrees.
+4. **Line orientation** (optional): PP-LCNet_x0_25_textline_ori, on the line
+   resized to 160×80 with ImageNet normalization in RGB order, turns a line
+   whose probability of 180 degrees reaches 0.9.
+5. **Recognition**: each line is resized to height 48, normalized to −1..1 in
+   BGR order, batched with lines of similar aspect ratio and right-padded with
+   zeros, and the output is decoded by CTC greedy decoding: argmax per step,
+   repeats collapsed, blank dropped, classes mapped **by index** onto the
+   dictionary (it lists some characters twice). Confidence is the mean
+   probability of the kept steps. A charset narrows the classes that compete.
+
+The constants are those of each model's own `inference.yml` and of PaddleOCR's
+published DB and CTC post-processing; the unit tests pin them with values
+worked out by hand.
+
+The pure-Go stages are exported for reuse and testing: `DBPostProcess`,
+`BoxScore`, `ConvexHull`, `MinAreaRect`, `MiniBox`, `Unclip`,
+`OrderClockwise`, `ReadingOrder`, `PerspectiveTransform`, `WarpQuad`,
+`CropSize`, `Rotate`, `DecodeCTC`, `NewVocabulary`, `RecognizerVocabulary`,
+`DetectorInputSize` and `RecognizerInputWidth`. `Manifests` and
+`LookupManifest` return the embedded model manifests.
+
+## The models
+
+The model files are not in this repository and are not distributed with it.
+Each has a manifest, embedded in the package under `manifests/`, recording its
+pinned source revision, SHA-256, licences and contract; `Runtime.Open` verifies
+every file against it before ONNX Runtime reads a byte.
+
+| id | file | sha256 | size | default |
+| --- | --- | --- | --- | --- |
+| `pp-ocrv5_mobile_det` | `PP-OCRv5_mobile_det_onnx/inference.onnx` | `a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d` | 4.8 MB | yes |
+| `pp-ocrv5_server_det` | `PP-OCRv5_server_det_onnx/inference.onnx` | `10803475a591f7dc623e24670fb5752ec94d39a1f8cf069aac1b6f0ce19cfc85` | 88 MB | `Detector: server` |
+| `latin_pp-ocrv5_mobile_rec` | `latin_PP-OCRv5_mobile_rec_onnx/inference.onnx` | `7888113072263cb471b93f66dd5e2ad70548dc526fa1ace760d0d973dd121498` | 8.0 MB | yes |
+| `en_pp-ocrv5_mobile_rec` | `en_PP-OCRv5_mobile_rec_onnx/inference.onnx` | `b5f833dfc5d0eb71da397b4efa06ebeee9b431b690a47d6af40d77d8eabc557f` | 7.8 MB | `Recognizer: en` |
+| `pp-lcnet_x0_25_textline_ori` | `PP-LCNet_x0_25_textline_ori_onnx/inference.onnx` | `94a6a0a0425f2b5f08b5df72086f2d72abe40f1d22f6d12d2cd83674f11f2ff3` | 1.0 MB | when enabled |
+| `pp-lcnet_x1_0_doc_ori` | `PP-LCNet_x1_0_doc_ori_onnx/inference.onnx` | `af9a0a4f317ff0709ce752067807f819cb15d883f8ecad89f28df1c6ee2d9c92` | 6.8 MB | when enabled |
+
+| | all six models |
+| --- | --- |
+| Source | the official `PaddlePaddle/<name>_onnx` repositories on Hugging Face, each URL pinned to a commit (in the manifest and in [THIRD_PARTY_MODELS.md](THIRD_PARTY_MODELS.md)) |
+| Code licence | Apache-2.0 (PaddleOCR) |
+| Model licence | Apache-2.0 |
+| Commercial use | yes, under Apache-2.0 |
+| Training data | not enumerated by the upstream repositories; see the PaddleOCR PP-OCRv5 documentation. Not evaluated here on real identity documents |
+| Status | `approved`, fp32 |
+
+No model here is `dev-only`, so this module has no switch to refuse one; a
+`dev-only` manifest would load and say so in every `ModelInfo.Status`.
+
+The recognizers' dictionaries — the `character_dict` of each model's
+`inference.yml`, one character per line — are embedded under `dictionaries/`
+and checked against their digest when a vocabulary is built. They are
+Apache-2.0 material from PaddlePaddle; see [NOTICE](NOTICE).
+
+### Download and verify
+
+```bash
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models@v0.1.0 -dir /srv/models/ocr
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models@v0.1.0 -dir /srv/models/ocr -check
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models@v0.1.0 -dir /srv/models/ocr \
+  -only pp-ocrv5_mobile_det,latin_pp-ocrv5_mobile_rec
+```
+
+The command downloads each file over HTTPS from the revision its manifest pins,
+follows only HTTPS redirects, caps each download at 512 MB, hashes while it
+writes, and renames the file into place only when the digest matches. A file
+already present with the right digest is left alone. `-check` verifies what is
+there and connects to nothing; it exits non-zero when a file is missing or
+altered. **The command is the only code in this repository that opens a
+network connection**, and an application never links it, which is why
+`arandu.mod.toml` declares `network = false`.
 
 ## Accuracy and speed
 
@@ -211,66 +241,102 @@ fonts, BSD licence) with invented text — "REPÚBLICA FEDERATIVA DO BRASIL",
 ±2 degrees: every line found on every page, 32 of 36 lines read exactly, a
 character error rate of 0.65 %. The accented line is read exactly every time;
 all four misses are the MRZ-like line's run of fifteen `<`, read one or two
-characters short — a long run of one character is where CTC greedy decoding
-is weakest. Pages turned by 90, 180 and 270 degrees
-are stood upright by the page classifier, and upside-down lines are turned by
-the line classifier.
+characters short — a long run of one character is where CTC greedy decoding is
+weakest. Pages turned by 90, 180 and 270 degrees are stood upright by the page
+classifier, and upside-down lines are turned by the line classifier.
 
-On an Apple M4 Max, CPU provider, ONNX Runtime 1.30.0, the 851×472 four-line
-page takes about 120 ms with the mobile detector, 138 ms with both orientation
-stages on, and 580 ms with the server detector
-(`go test -run '^$' -bench . ./tests/Feature/`).
+Speed, on the 851×472 four-line page, CPU provider, ONNX Runtime 1.30.0, on an
+Apple M4 Max (`go test -run '^$' -bench . ./tests/Feature/`):
 
-These are figures on clean synthetic text, not on photographs of documents.
+| configuration | per page |
+| --- | --- |
+| mobile detector | about 95–120 ms |
+| mobile detector, both orientation stages | about 95–140 ms |
+| server detector | about 580 ms |
 
-## Concurrency
+These figures are indicative. They are on clean synthetic text, on one machine,
+and are not a measurement on photographs of documents.
 
-`Recognize` is safe for concurrent use. Calls share the ONNX Runtime sessions,
-whose runs are thread-safe; the module's reader-writer lock lets them proceed
-together and makes `Close` wait for them.
+## Limitations, and what needs evaluation
 
-## Why there is no table, policy or route
-
-This repository has the shape of the Arandu package skeleton without its demo
-entity, like `arandu-onnx`. It wraps a technology and owns no record, so there
-is nothing for a policy to decide about; a route would read any image for
-anybody who sent one. Text is read through the application's controllers and
-Grants.
-
-## Limitations
-
+- Accuracy is measured on synthetic text only. Before relying on it, measure
+  character error rate on a consented, representative set of the documents you
+  will read — camera captures, glare, blur, low resolution, worn prints.
 - Lines are rectangles: curved text is boxed by its minimum-area rectangle.
 - Vertical text is turned 90 degrees and read as a horizontal line; nothing
   here reads top-to-bottom scripts.
 - The crop interpolates bilinearly where PaddleOCR uses bicubic.
 - With line orientation on and page orientation off, an upside-down page is
   read line by line correctly but in reverse reading order.
-- Accuracy is measured on synthetic text only.
 - Long runs of one character, such as the filler `<` of a machine-readable
   zone, may be read a character or two short. A caller that knows the zone's
   fixed length pads or checks it; this package does not.
 
-## Gates
+## Security and privacy
 
-```sh
+Images of identity documents are personal data, and in many jurisdictions
+(LGPD, GDPR) the data on them is sensitive. This package keeps nothing: it does
+not store, log or transmit the image or the text it reads. Storing the raw
+image, encrypting it, minimising what is kept and auditing access are the
+application's responsibility.
+
+`DecodeImage` bounds the pixel count before decoding, and every model file is
+verified against its digest before the native runtime parses it. Report
+vulnerabilities privately; see [SECURITY.md](SECURITY.md).
+
+## Why there is no table, policy or route
+
+It wraps a technology and owns no record, so there is nothing for a policy to
+decide about; a route would read any image for anybody who sent one. Text is
+read through the application's controllers and Grants. `arandu.mod.toml`
+declares `filesystem = true` and nothing else, and `tests/Unit/audit_test.go`
+checks that declaration against what the code calls.
+
+## Tests
+
+```bash
 export GOWORK=off CGO_ENABLED=1
-gofmt -l $(find . -name '*.go' -not -path '*/testdata/*' -not -name '*.kyse.go')
+test -z "$(gofmt -l $(find . -name '*.go' -not -path '*/testdata/*' -not -name '*.kyse.go'))"
 go build ./...
 go vet ./...
-go test -race ./...
+go test -race -count=1 ./...
 ```
 
-The pipeline tests read the models from `PADDLEOCR_MODELS_DIR`, or from the KUAA
-workspace's `models/ocr_official` two levels above this checkout, and skip,
-saying where they looked, when the files are not there; they skip too when
-ONNX Runtime is absent. A skip is a reason to fetch the models, not a green
-result for the pipeline. No test downloads anything.
+The pipeline tests read the models from the directory `PADDLEOCR_MODELS_DIR`
+names, or from `../../models/ocr_official` when it is unset, and skip, saying
+where they looked, when the files are not there; they skip too when ONNX
+Runtime is absent. No test downloads anything. To run them:
+
+```bash
+go run ./cmd/paddleocr-models -dir /tmp/ocr-models
+PADDLEOCR_MODELS_DIR=/tmp/ocr-models go test -race -count=1 ./...
+```
+
+CI installs ONNX Runtime 1.30.0, fetches and verifies the models with the same
+command, and runs the suite with nothing skipped. Every test page is drawn in
+Go with invented text; no photograph or real document is read.
+
+## Versioning and releases
+
+The module follows [Semantic Versioning](https://semver.org/). While the major
+version is `v0`, a minor release may break the API, and every break is named in
+[UPGRADE.md](UPGRADE.md); CI compares the exported API with the last tag. A
+changed default (`LimitSideLen`, `BoxThresh`, the detector) or a new model
+revision changes every application that never set it, and is always a
+changelog line.
+
+A release is a tag `vX.Y.Z` on `main` whose notes are the `## [X.Y.Z] - date`
+entry already committed in [CHANGELOG.md](CHANGELOG.md). The release workflow
+refuses a `go.mod` that still replaces a module with a local path, re-runs the
+gates on the exact tag archive with the models fetched, audits known
+vulnerabilities, and publishes those notes. A published version is immutable.
 
 ## Licence
 
-MIT. See [LICENSE.md](LICENSE.md).
+The code is MIT; see [LICENSE.md](LICENSE.md). Copyright HYZIS - Serviços
+Digitais Ltda.
 
-The dictionaries under `dictionaries/` are the character lists of the
-PaddleOCR recognizers, from PaddlePaddle's model repositories, under the
-Apache License 2.0 (<https://www.apache.org/licenses/LICENSE-2.0>). The model
-files, which this repository does not contain, are under the same licence.
+The dictionaries under `dictionaries/` are PaddlePaddle's, under the Apache
+License 2.0; see [NOTICE](NOTICE). The model weights are not part of this
+repository; each is under its own licence, listed in
+[THIRD_PARTY_MODELS.md](THIRD_PARTY_MODELS.md).

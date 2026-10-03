@@ -1,0 +1,55 @@
+Arandu PaddleOCR
+Copyright (c) HYZIS - SERVICOS DIGITAIS LTDA - EPP
+
+The source code of this repository is licensed under the MIT License; see
+LICENSE.md.
+
+This repository also contains third-party material, which keeps its own
+licence:
+
+-------------------------------------------------------------------------------
+PaddleOCR recognizer dictionaries
+
+  dictionaries/latin_ppocrv5_dict.txt
+    the character_dict of inference.yml in
+    https://huggingface.co/PaddlePaddle/latin_PP-OCRv5_mobile_rec_onnx
+    at revision 89d3a50e2c27e2e7cceeab0e944c25c807d5db4f,
+    written one character per line
+
+  dictionaries/en_ppocrv5_dict.txt
+    the character_dict of inference.yml in
+    https://huggingface.co/PaddlePaddle/en_PP-OCRv5_mobile_rec_onnx
+    at revision 3fafbc3b5dcf93dd72add9f48368be8a3a2cd33b,
+    written one character per line
+
+  Copyright (c) PaddlePaddle Authors. All Rights Reserved.
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use these files except in compliance with the License. You may obtain a copy
+  of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations
+  under the License.
+
+  Modification: the YAML list was rewritten as a plain text file, one entry
+  per line, in the original order. No entry was added, removed or changed.
+
+-------------------------------------------------------------------------------
+PaddleOCR pre- and post-processing parameters
+
+The pipeline's constants (input sizes, normalization, DB thresholds, unclip
+ratio, reading-order tolerance, CTC decoding rules) follow the published
+inference.yml of each model and the documented behaviour of PaddleOCR
+(https://github.com/PaddlePaddle/PaddleOCR, Apache License 2.0). The Go
+implementation is this repository's own.
+
+-------------------------------------------------------------------------------
+Model weights
+
+The ONNX model files are NOT part of this repository and are not distributed
+with it. cmd/paddleocr-models downloads them from their upstream repositories.
+Each is under its own licence; see THIRD_PARTY_MODELS.md.

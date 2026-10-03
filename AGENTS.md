@@ -12,9 +12,11 @@ line of wiring is not written in the installer's repository, it does not happen.
 Read `.agents/skills/` before writing code. Each skill is a procedure, and the
 one you need is named by the situation you are in.
 
-## The KUAA rules
+## The rules
 
-These come from the project, not from taste. A change that breaks one is not
+These come from the engines' design, not from taste. They were written for
+KUAA, the identity-verification application these engines were built for, and
+they hold for every installer. A change that breaks one is not
 merged.
 
 1. **No decisions, and no document semantics.** This package returns text,
@@ -79,6 +81,8 @@ ctc.go        vocabulary, charset mask, CTC greedy decoding
 manifests/    one manifest per model
 dictionaries/ the recognizers' character lists
 cmd/paddleocr-models/  downloads and verifies the model files
+NOTICE        the licence of the bundled PaddlePaddle dictionaries
+THIRD_PARTY_MODELS.md  the upstream, revision, digest and licence of every model
 ```
 
 Tests live under `tests/Unit` (geometry, DB, crop, CTC, manifests, config, the

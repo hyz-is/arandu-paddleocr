@@ -1,5 +1,15 @@
 # Upgrade Guide
 
-## Unreleased
+Every release that changes what an installer has to write is described here,
+newest first. A release with nothing to change still has a heading, so this file
+and [CHANGELOG.md](CHANGELOG.md) describe the same set of versions.
 
-The first release. Nothing to upgrade from.
+## v0.1.0
+
+The first public release. Nothing to upgrade from.
+
+A checkout that imported the module before it was published under its current
+path replaces the old import paths with `github.com/hyz-is/arandu-paddleocr` and
+`github.com/hyz-is/arandu-onnx`, and requires both at `v0.1.0`. Tests that set
+the models directory through an environment variable now set
+`PADDLEOCR_MODELS_DIR`.

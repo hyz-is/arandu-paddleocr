@@ -10,6 +10,12 @@ a release is corrected by another release and never by moving a tag.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-03
+
+The first public release, as `github.com/hyz-is/arandu-paddleocr`. It requires
+`github.com/hyz-is/arandu-onnx` v0.1.0 and ONNX Runtime 1.26 or later (CI and
+release run 1.30.0).
+
 ### Added
 
 - `Module`: `foundation.Module` with no route, plus `Bootable` (opens the
@@ -36,3 +42,12 @@ a release is corrected by another release and never by moving a tag.
   `DecodeCTC`, `DetectorInputSize`, `RecognizerInputWidth`.
 - `cmd/paddleocr-models`: downloads the model files over HTTPS and verifies
   their digests; `-check` verifies without connecting.
+- `NOTICE` for the Apache-2.0 dictionaries and `THIRD_PARTY_MODELS.md` for the
+  model weights, which are not distributed with the module.
+
+### Measured
+
+- On synthetic pages drawn in Go: every line found, 32 of 36 lines read
+  exactly, character error rate 0.65 %. About 95–120 ms per page with the
+  mobile detector and 580 ms with the server detector on an Apple M4 Max, CPU
+  provider. Indicative only; not measured on real documents.

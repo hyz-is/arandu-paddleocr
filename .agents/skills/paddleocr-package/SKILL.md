@@ -19,8 +19,8 @@ later) on the machine that runs the application, as `arandu-onnx` requires.
 ## Install and fetch the models
 
 ```bash
-go get github.com/hyz-is/arandu-paddleocr
-go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
+go get github.com/hyz-is/arandu-paddleocr@v0.1.0
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models@v0.1.0 -dir /srv/models/ocr
 ```
 
 The command downloads every model over HTTPS from its pinned revision and keeps
