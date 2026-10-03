@@ -9,7 +9,7 @@ import (
 	"sort"
 	"time"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
+	onnx "github.com/hyz-is/arandu-onnx"
 )
 
 // Options are what one Recognize call may narrow.

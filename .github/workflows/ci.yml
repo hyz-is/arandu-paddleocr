@@ -12,7 +12,7 @@ permissions:
 env:
   CGO_ENABLED: "1"
 
-# go.mod resolves github.com/kuaa-io/arandu-onnx from ../arandu-onnx until that
+# go.mod resolves github.com/hyz-is/arandu-onnx from ../arandu-onnx until that
 # module is tagged, so the two repositories are checked out side by side and
 # every step runs in this one. The second checkout and the replace go together.
 defaults:
@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/checkout@v7
         with:
-          repository: kuaa-io/arandu-onnx
+          repository: hyz-is/arandu-onnx
           path: arandu-onnx
 
       - uses: actions/setup-go@v7

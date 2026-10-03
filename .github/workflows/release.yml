@@ -4,7 +4,7 @@ name: release
 # exact entry and never writes back to the repository, so a release cannot add
 # a second changelog heading after the immutable module version already exists.
 #
-# A tag is cut only once go.mod no longer replaces github.com/kuaa-io/arandu-onnx
+# A tag is cut only once go.mod no longer replaces github.com/hyz-is/arandu-onnx
 # with ../arandu-onnx: a published module with a replace pointing outside
 # itself does not build for anybody who runs go get. The first step refuses it.
 on:

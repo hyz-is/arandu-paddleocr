@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 func TestEveryShippedManifestRecordsItsProvenance(t *testing.T) {

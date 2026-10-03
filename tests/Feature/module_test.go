@@ -11,8 +11,8 @@ import (
 	"github.com/arandu-io/framework/foundation"
 	fhttp "github.com/arandu-io/framework/http"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // These tests drive the module the way an application does: build it,

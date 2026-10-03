@@ -4,7 +4,7 @@ import (
 	"image"
 	"testing"
 
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // gradient is an image whose pixel (x, y) has red x, green y and blue x+y, so

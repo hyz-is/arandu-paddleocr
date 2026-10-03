@@ -6,7 +6,7 @@ import (
 	"image"
 	"math"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
+	onnx "github.com/hyz-is/arandu-onnx"
 )
 
 // Homography is a 3×3 projective transform, row by row. It maps (x, y) to

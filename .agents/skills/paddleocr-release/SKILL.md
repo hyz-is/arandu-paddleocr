@@ -28,7 +28,7 @@ calling it green.
 ## What the manifest declares, and who reads it
 
 ```toml
-name = "kuaa-io/paddleocr"
+name = "hyz-is/paddleocr"
 framework = ">= 0.50"
 profiles = ["conventional", "performance"]
 
@@ -50,7 +50,7 @@ The `framework` line is a floor, and `go.mod` says it too. Move both together.
 
 ## The replace
 
-`go.mod` replaces `github.com/kuaa-io/arandu-onnx` with `../arandu-onnx` while
+`go.mod` replaces `github.com/hyz-is/arandu-onnx` with `../arandu-onnx` while
 that module is unpublished. Before the first tag here: tag arandu-onnx, require
 it at that version, delete the replace and its comment, and run the gates from
 a checkout without the sibling. The release workflow refuses a local replace.

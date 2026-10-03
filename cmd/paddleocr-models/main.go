@@ -7,7 +7,7 @@
 // anything. Run it once, where the application is deployed or when the image
 // is built:
 //
-//	go run github.com/kuaa-io/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
+//	go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
 //
 // Each file is fetched over HTTPS from the source_url its manifest records,
 // which pins a revision, written beside its final name, hashed while it is
@@ -32,8 +32,8 @@ import (
 	"strings"
 	"time"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // maxModelBytes caps one download. The largest model is under 100 MB.

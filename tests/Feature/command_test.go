@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // The download command is exercised here only in -check mode, which reads the

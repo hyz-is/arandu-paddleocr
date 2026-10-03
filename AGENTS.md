@@ -59,7 +59,7 @@ not a green result for the pipeline.
 `GOWORK=off` matters because this checkout may sit beside a Go workspace that
 does not list it.
 
-`go.mod` replaces `github.com/kuaa-io/arandu-onnx` with `../arandu-onnx` until
+`go.mod` replaces `github.com/hyz-is/arandu-onnx` with `../arandu-onnx` until
 that module is tagged. Build from a checkout that has it beside this one.
 
 `aru doctor` reads applications, not libraries. That is why

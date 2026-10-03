@@ -10,8 +10,8 @@ import (
 	"sync"
 	"testing"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // These tests read synthetic pages with the real PP-OCRv5 models. The pages

@@ -5,7 +5,7 @@ import (
 	"slices"
 	"testing"
 
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // steps builds recognizer output in which each step puts p on one class and

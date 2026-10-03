@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // probabilityMap is a map of the given size whose every pixel is background.

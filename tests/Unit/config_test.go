@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 func TestConfigValidateRefusesWhatCannotWork(t *testing.T) {

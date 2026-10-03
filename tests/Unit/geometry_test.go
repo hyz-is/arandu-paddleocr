@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // The golden values below are worked out by hand in the comments beside

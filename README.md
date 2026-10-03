@@ -6,7 +6,7 @@
 
 An Arandu package that reads the text on an image with the PaddleOCR PP-OCRv5
 models, run through ONNX Runtime by
-[`arandu-onnx`](https://github.com/kuaa-io/arandu-onnx). It finds the lines,
+[`arandu-onnx`](https://github.com/hyz-is/arandu-onnx). It finds the lines,
 straightens them, reads them, and returns each line with its box, its
 confidence and the models that produced it. It decides nothing: what the text
 means — a name, a CPF, a machine-readable zone — is the application's
@@ -53,13 +53,13 @@ Development and the tests use 1.30.0.
 ## Install
 
 ```bash
-go get github.com/kuaa-io/arandu-paddleocr
+go get github.com/hyz-is/arandu-paddleocr
 ```
 
 Until `arandu-onnx` is tagged, `go.mod` resolves it from the sibling checkout:
 
 ```
-replace github.com/kuaa-io/arandu-onnx => ../arandu-onnx
+replace github.com/hyz-is/arandu-onnx => ../arandu-onnx
 ```
 
 That line is removed, and `arandu-onnx` required at its tag, once that module
@@ -93,8 +93,8 @@ manifests' `file` fields say (`PP-OCRv5_mobile_det_onnx/inference.onnx`, …).
 `cmd/paddleocr-models` fills one:
 
 ```bash
-go run github.com/kuaa-io/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
-go run github.com/kuaa-io/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr -check
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr -check
 ```
 
 It downloads each file over HTTPS from the revision its manifest pins, follows
@@ -115,8 +115,8 @@ The imports, with the other module imports:
 
 ```go
 import (
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 ```
 

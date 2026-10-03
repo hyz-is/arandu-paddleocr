@@ -17,8 +17,8 @@ import (
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
 
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 
 // These helpers load the real models and draw the pages the tests read.

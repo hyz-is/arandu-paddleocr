@@ -1,6 +1,6 @@
 ---
 name: paddleocr-package
-description: Install, wire and use the Arandu PaddleOCR package (Go, Arandu) in an application. Use when the request is to "install arandu-paddleocr", "read text from an image", "OCR a document", "read the MRZ", "go get github.com/kuaa-io/arandu-paddleocr", "wire it into bootstrap/app.go", "download the OCR models", "the boot fails opening pp-ocrv5_mobile_det", "model digest mismatch", "the text comes back empty", or when a project's go.mod already requires github.com/kuaa-io/arandu-paddleocr. Covers the build requirement, the models directory, the wiring and where it goes, the Config fields, the result, and what each error means.
+description: Install, wire and use the Arandu PaddleOCR package (Go, Arandu) in an application. Use when the request is to "install arandu-paddleocr", "read text from an image", "OCR a document", "read the MRZ", "go get github.com/hyz-is/arandu-paddleocr", "wire it into bootstrap/app.go", "download the OCR models", "the boot fails opening pp-ocrv5_mobile_det", "model digest mismatch", "the text comes back empty", or when a project's go.mod already requires github.com/hyz-is/arandu-paddleocr. Covers the build requirement, the models directory, the wiring and where it goes, the Config fields, the result, and what each error means.
 license: MIT
 ---
 
@@ -19,8 +19,8 @@ later) on the machine that runs the application, as `arandu-onnx` requires.
 ## Install and fetch the models
 
 ```bash
-go get github.com/kuaa-io/arandu-paddleocr
-go run github.com/kuaa-io/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
+go get github.com/hyz-is/arandu-paddleocr
+go run github.com/hyz-is/arandu-paddleocr/cmd/paddleocr-models -dir /srv/models/ocr
 ```
 
 The command downloads every model over HTTPS from its pinned revision and keeps
@@ -34,8 +34,8 @@ All of it is in `bootstrap/app.go`, after the `arandu-onnx` module.
 
 ```go
 import (
-	onnx "github.com/kuaa-io/arandu-onnx"
-	paddleocr "github.com/kuaa-io/arandu-paddleocr"
+	onnx "github.com/hyz-is/arandu-onnx"
+	paddleocr "github.com/hyz-is/arandu-paddleocr"
 )
 ```
 
