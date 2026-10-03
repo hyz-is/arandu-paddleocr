@@ -260,7 +260,7 @@ go vet ./...
 go test -race ./...
 ```
 
-The pipeline tests read the models from `KUAA_MODELS_DIR`, or from the KUAA
+The pipeline tests read the models from `PADDLEOCR_MODELS_DIR`, or from the KUAA
 workspace's `models/ocr_official` two levels above this checkout, and skip,
 saying where they looked, when the files are not there; they skip too when
 ONNX Runtime is absent. A skip is a reason to fetch the models, not a green

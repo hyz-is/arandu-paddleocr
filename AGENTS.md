@@ -34,7 +34,7 @@ merged.
    reads model files from `Config.ModelsDir`.
 5. **Configuration is typed.** `Config` comes from the application. This
    package reads no environment variable; only the tests read
-   `KUAA_MODELS_DIR`.
+   `PADDLEOCR_MODELS_DIR`.
 6. **Fixtures are synthetic.** No real document, face, name or number in a
    test, an example or a log line.
 
@@ -52,7 +52,7 @@ go test -race ./...
 
 `CGO_ENABLED=1` is required: arandu-onnx's binding is cgo. The pipeline tests
 need the ONNX Runtime shared library and the model files, from
-`KUAA_MODELS_DIR` or the KUAA workspace's `models/ocr_official`; where either
+`PADDLEOCR_MODELS_DIR` or `../../models/ocr_official`; where either
 is absent they skip saying why, and the skip is a reason to fix the machine,
 not a green result for the pipeline.
 

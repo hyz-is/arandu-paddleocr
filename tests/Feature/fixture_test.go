@@ -24,15 +24,16 @@ import (
 // These helpers load the real models and draw the pages the tests read.
 //
 // The models are not in the repository. The tests look for them in the
-// directory KUAA_MODELS_DIR names, or in the KUAA workspace's model cache two
-// levels above this checkout, and skip, saying where they looked, when neither
+// directory PADDLEOCR_MODELS_DIR names, or in models/ocr_official two levels
+// above this checkout (where a workspace that holds the module under modules/
+// keeps its model cache), and skip, saying where they looked, when neither
 // has them. The pages are drawn with the Go fonts (BSD licence) and contain
 // only invented text.
 
 // modelsDir is the directory holding the model files, or a skip.
 func modelsDir(t testing.TB) string {
 	t.Helper()
-	dir := os.Getenv("KUAA_MODELS_DIR")
+	dir := os.Getenv("PADDLEOCR_MODELS_DIR")
 	if dir == "" {
 		dir = filepath.Join(packageRoot(t), "..", "..", "models", "ocr_official")
 	}
@@ -41,7 +42,7 @@ func modelsDir(t testing.TB) string {
 		t.Fatalf("looking up the detector's manifest: %v", err)
 	}
 	if _, err := os.Stat(filepath.Join(dir, manifest.File)); err != nil {
-		t.Skipf("the PP-OCRv5 models are not in %s (set KUAA_MODELS_DIR, or fill it with go run ./cmd/paddleocr-models -dir %s): %v", dir, dir, err)
+		t.Skipf("the PP-OCRv5 models are not in %s (set PADDLEOCR_MODELS_DIR, or fill it with go run ./cmd/paddleocr-models -dir %s): %v", dir, dir, err)
 	}
 	return dir
 }

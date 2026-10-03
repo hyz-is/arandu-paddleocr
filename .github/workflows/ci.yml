@@ -49,7 +49,7 @@ jobs:
       - name: install ONNX Runtime
         run: |
           set -euo pipefail
-          version=1.27.1
+          version=1.30.0
           curl -fsSL "https://github.com/microsoft/onnxruntime/releases/download/v${version}/onnxruntime-linux-x64-${version}.tgz" \
             | tar -xz -C "$RUNNER_TEMP"
           sudo cp -P "$RUNNER_TEMP/onnxruntime-linux-x64-${version}/lib/"libonnxruntime*.so* /usr/local/lib/
@@ -57,12 +57,13 @@ jobs:
 
       # The models are not in the repository. The download command fetches
       # them from the revisions the manifests pin and verifies every digest;
-      # the tests then read them from KUAA_MODELS_DIR and never download.
+      # the tests then read them from PADDLEOCR_MODELS_DIR and never download.
       - name: fetch the models
         run: |
           set -euo pipefail
           GOWORK=off go run ./cmd/paddleocr-models -dir "$RUNNER_TEMP/models"
-          echo "KUAA_MODELS_DIR=$RUNNER_TEMP/models" >> "$GITHUB_ENV"
+          GOWORK=off go run ./cmd/paddleocr-models -dir "$RUNNER_TEMP/models" -check
+          echo "PADDLEOCR_MODELS_DIR=$RUNNER_TEMP/models" >> "$GITHUB_ENV"
 
       - name: gofmt
         # Two filters, and neither is preference. gofmt is the only tool in the

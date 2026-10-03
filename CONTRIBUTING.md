@@ -21,7 +21,7 @@ excludes; `testdata/` holds fixtures that are invalid on purpose.
 
 The pipeline tests need the ONNX Runtime shared library and the model files,
 and skip, saying why, where either is absent. Fetch the models once with
-`go run ./cmd/paddleocr-models -dir <dir>` and point `KUAA_MODELS_DIR` at the
+`go run ./cmd/paddleocr-models -dir <dir>` and point `PADDLEOCR_MODELS_DIR` at the
 directory. A pull request that touches the pipeline is run with both present.
 
 ## What a change has to keep true
