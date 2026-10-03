@@ -61,8 +61,10 @@ not a green result for the pipeline.
 `GOWORK=off` matters because this checkout may sit beside a Go workspace that
 does not list it.
 
-`go.mod` replaces `github.com/hyz-is/arandu-onnx` with `../arandu-onnx` until
-that module is tagged. Build from a checkout that has it beside this one.
+While `go.mod` replaces `github.com/hyz-is/arandu-onnx` with `../arandu-onnx`,
+build from a checkout that has it beside this one. Once arandu-onnx is required
+at a tag the replace is gone, the checkout builds on its own, and the release
+workflow, which refuses a local replace, can publish this module.
 
 `aru doctor` reads applications, not libraries. That is why
 `tests/Unit/audit_test.go` compares `arandu.mod.toml` with what the code calls.
